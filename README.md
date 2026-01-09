@@ -1,2 +1,2 @@
-# Sillaka
-[pagina] (silla web.html)
+# sils
+[Página de Silla](silla.html)
