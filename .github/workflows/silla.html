@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Bird Store</title></head>
+<body>
+  <h1>🐦 Bird Store</h1>
+  <a href="/">Volver</a><br><br>
+  <% if (user) { %>
+    <h2>Subir nueva app/página</h2>
+    <form action="/apps/submit" method="POST">
+      Nombre: <input type="text" name="name" required><br><br>
+      Descripción: <textarea name="description"></textarea><br><br>
+      URL: <input type="url" name="url" placeholder="https://..."><br><br>
+      <button>Subir para aprobación</button>
+    </form>
+    <hr>
+  <% } %>
+  <h2>Apps disponibles</h2>
+  <% if (apps.length === 0) { %><p>No hay apps aprobadas aún.</p><% } %>
+  <% apps.forEach(app => { %>
+    <div style="border:1px solid #ccc;margin:20px;padding:15px">
+      <h3><%= app.name %></h3>
+      <p><%= app.description || 'Sin descripción' %></p>
+      <a href="<%= app.url %>" target="_blank">Abrir app</a>
+    </div>
+  <% }) %>
+</body>
+  </html>
