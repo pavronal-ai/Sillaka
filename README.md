@@ -1,2 +1,2 @@
 # sils
-[Página de Silla](silla.html)
+[Página de Silla](index.html)
