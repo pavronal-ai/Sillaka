@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SillaOS - Escritorio</title>
+    <style>
+        :root { --bg-color: #3498db; --bar-color: #2980b9; }
+        body { background: var(--bg-color); margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; transition: background 0.5s; }
+        
+        /* Barra de tareas */
+        .taskbar { position: absolute; bottom: 0; width: 100%; height: 50px; background: var(--bar-color); display: flex; align-items: center; padding: 0 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); }
+        .start-btn { font-size: 20px; cursor: pointer; margin-right: 20px; }
+        
+        /* Escritorio */
+        .desktop { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, 100px); gap: 20px; }
+        .app-icon { width: 80px; height: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-align: center; }
+        .app-box { width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-bottom: 5px; }
+        .app-box:hover { background: rgba(255,255,255,0.4); }
+
+        /* Ventana Modal para Apps */
+        .window { position: absolute; top: 10%; left: 10%; width: 80%; height: 70%; background: white; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; flex-direction: column; }
+        .win-header { background: #ddd; padding: 5px 10px; display: flex; justify-content: space-between; border-radius: 5px 5px 0 0; }
+        .win-content { flex: 1; padding: 20px; overflow: auto; }
+        .close-btn { cursor: pointer; color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="desktop" id="desktopGrid">
+        <div class="app-icon" onclick="toggleTheme()">
+            <div class="app-box">🎨</div>
+            <span>Tema</span>
+        </div>
+        </div>
+
+    <div class="window" id="appWindow">
+        <div class="win-header">
+            <span id="winTitle">Aplicación</span>
+            <span class="close-btn" onclick="closeApp()">X</span>
+        </div>
+        <div class="win-content" id="winBody"></div>
+    </div>
+
+    <div class="taskbar">
+        <div class="start-btn">🐦 SillaOS</div>
+        <div style="color:white; margin-left:auto;" id="userInfo"></div>
+        <button onclick="logout()" style="margin-left: 10px; background:red; border:none; color:white; cursor:pointer;">Salir</button>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) window.location.href = 'login.html';
+
+        document.getElementById('userInfo').innerText = `Usuario: ${user.email}`;
+
+        // Cargar Apps
+        const desktop = document.getElementById('desktopGrid');
+        
+        // Si es admin, mostrar Dashboard
+        if (user.role === 'admin') {
+            const dashIcon = document.createElement('div');
+            dashIcon.className = 'app-icon';
+            dashIcon.innerHTML = `<div class="app-box" style="background:orange;">⚙️</div><span>Dashboard</span>`;
+            dashIcon.onclick = () => window.location.href = 'dashboard.html';
+            desktop.appendChild(dashIcon);
+        }
+
+        // Cargar Apps del "Store" (LocalStorage)
+        const apps = JSON.parse(localStorage.getItem('sillaApps')) || [];
+        apps.forEach(app => {
+            const div = document.createElement('div');
+            div.className = 'app-icon';
+            div.innerHTML = `<div class="app-box">📱</div><span>${app.name}</span>`;
+            div.onclick = () => openApp(app.name, app.html);
+            desktop.appendChild(div);
+        });
+
+        function toggleTheme() {
+            const body = document.body;
+            const current = getComputedStyle(body).getPropertyValue('--bg-color');
+            if(current.trim() === '#3498db') {
+                body.style.setProperty('--bg-color', '#2c3e50'); // Modo Noche
+                body.style.setProperty('--bar-color', '#1a252f');
+            } else {
+                body.style.setProperty('--bg-color', '#3498db'); // Modo Día (Pájaro Azul)
+                body.style.setProperty('--bar-color', '#2980b9');
+            }
+        }
+
+        function openApp(title, content) {
+            document.getElementById('appWindow').style.display = 'flex';
+            document.getElementById('winTitle').innerText = title;
+            document.getElementById('winBody').innerHTML = content;
+        }
+
+        function closeApp() {
+            document.getElementById('appWindow').style.display = 'none';
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SillaOS - Registro</title>
+    <style>
+        body { background: #2c3e50; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .reg-box { background: #34495e; padding: 40px; border-radius: 10px; width: 300px; }
+        input { width: 90%; margin: 5px 0; padding: 10px; border-radius: 5px; border: none; }
+        .task-area { background: #22303c; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 0.8em; }
+        button { background: #e67e22; border: none; padding: 10px; width: 100%; color: white; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="reg-box">
+        <h2>Crear Cuenta 🐦</h2>
+        <input type="email" id="email" placeholder="nombre@silla.com">
+        <input type="password" id="pass" placeholder="Contraseña">
+        
+        <div class="task-area">
+            <p><strong>Misión para Admin:</strong> Haz clic 10 veces al botón para obtener la Key.</p>
+            <button onclick="doTask()" id="taskBtn" style="background:#3498db; width: auto;">Tarea (0/10)</button>
+            <div id="keyDisplay" style="color: #f1c40f; margin-top:5px; font-weight:bold;"></div>
+        </div>
+
+        <input type="text" id="adminKey" placeholder="Admin Key (Opcional)">
+        <button onclick="register()">Registrarse</button>
+        <a href="login.html" style="color:white; display:block; text-align:center; margin-top:10px;">Volver al Login</a>
+    </div>
+
+    <script>
+        let clicks = 0;
+        const SECRET_KEY = "PAJARO_SUPREMO";
+
+        function doTask() {
+            clicks++;
+            document.getElementById('taskBtn').innerText = `Tarea (${clicks}/10)`;
+            if(clicks >= 10) {
+                document.getElementById('keyDisplay').innerText = "KEY: " + SECRET_KEY;
+                alert("¡Tarea completada! Copia la Key.");
+            }
+        }
+
+        function register() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            const keyInput = document.getElementById('adminKey').value;
+
+            if (!email.endsWith('@silla.com')) {
+                alert('El correo debe terminar en @silla.com');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('sillaUsers')) || [];
+            const isAdmin = keyInput === SECRET_KEY;
+
+            users.push({ email, pass, role: isAdmin ? 'admin' : 'user' });
+            localStorage.setItem('sillaUsers', JSON.stringify(users));
+            
+            alert('Cuenta creada exitosamente. Ahora vuela al login.');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

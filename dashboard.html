@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SillaOS - Admin Dashboard</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #ecf0f1; }
+        h1 { color: #e67e22; }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        button { cursor: pointer; padding: 5px 10px; }
+        .btn-del { background: #e74c3c; color: white; border: none; }
+        textarea { width: 100%; height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>🦅 Nido de Administración (Dashboard)</h1>
+    <button onclick="window.location.href='index.html'">⬅ Volver al Escritorio</button>
+
+    <div class="section">
+        <h3>Subir Nueva App (Play Store)</h3>
+        <input type="text" id="appName" placeholder="Nombre de la App"><br><br>
+        <textarea id="appHtml" placeholder="Código HTML de la App (Ej: <h1>Hola</h1><p>Esto es una app</p>)"></textarea><br>
+        <button onclick="addApp()" style="background:#2ecc71; color:white; border:none; padding:10px; margin-top:10px;">Publicar App</button>
+    </div>
+
+    <div class="section">
+        <h3>Apps Instaladas</h3>
+        <table id="appTable">
+            <thead><tr><th>Nombre</th><th>Acción</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h3>Usuarios del Nido</h3>
+        <table id="userTable">
+            <thead><tr><th>Email</th><th>Rol</th><th>Acción</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Verificar Admin
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user || user.role !== 'admin') {
+            alert('¡ALTO AHÍ! No eres un pájaro alfa (Admin).');
+            window.location.href = 'index.html';
+        }
+
+        // Cargar datos
+        let apps = JSON.parse(localStorage.getItem('sillaApps')) || [];
+        let users = JSON.parse(localStorage.getItem('sillaUsers')) || [];
+
+        function render() {
+            // Render Apps
+            const appBody = document.querySelector('#appTable tbody');
+            appBody.innerHTML = '';
+            apps.forEach((app, index) => {
+                const row = `<tr>
+                    <td>${app.name}</td>
+                    <td><button class="btn-del" onclick="deleteApp(${index})">Borrar</button></td>
+                </tr>`;
+                appBody.innerHTML += row;
+            });
+
+            // Render Users
+            const userBody = document.querySelector('#userTable tbody');
+            userBody.innerHTML = '';
+            users.forEach((u, index) => {
+                const row = `<tr>
+                    <td>${u.email}</td>
+                    <td>${u.role}</td>
+                    <td><button class="btn-del" onclick="deleteUser(${index})">Expulsar</button></td>
+                </tr>`;
+                userBody.innerHTML += row;
+            });
+        }
+
+        function addApp() {
+            const name = document.getElementById('appName').value;
+            const html = document.getElementById('appHtml').value;
+            if(name && html) {
+                apps.push({ name, html });
+                localStorage.setItem('sillaApps', JSON.stringify(apps));
+                alert('App subida al sistema.');
+                render();
+            }
+        }
+
+        function deleteApp(index) {
+            const justification = prompt("Escribe una justificación para borrar esta App:");
+            if (justification && justification.length > 5) {
+                apps.splice(index, 1);
+                localStorage.setItem('sillaApps', JSON.stringify(apps));
+                render();
+            } else {
+                alert("Justificación demasiado corta o cancelada.");
+            }
+        }
+
+        function deleteUser(index) {
+            const justification = prompt("Escribe una justificación para expulsar a este usuario:");
+            if (justification && justification.length > 5) {
+                users.splice(index, 1);
+                localStorage.setItem('sillaUsers', JSON.stringify(users));
+                render();
+            } else {
+                alert("Justificación requerida para expulsar del nido.");
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>
